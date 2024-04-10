@@ -3,6 +3,7 @@ Attempt to handle stream marckdown
 
 ## Usage
 
+Clone the repo or dowload `stream_md_processor.js`.
 Add wherever you need it:
 ```HTML
 <script src="ypur_path/stream_md_processor.js"></script>
