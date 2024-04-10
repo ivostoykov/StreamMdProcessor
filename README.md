@@ -28,6 +28,6 @@ StreamMarkdownProcessor.dispose();
 ```
 
 -----
-Here is the result of this Readme file processed:
+Here is the result of this Readme file source processed:
 
 ![Screenshot from 2024-04-10 12-36-10](https://github.com/ivostoykov/StreamMdProcessor/assets/889184/b3080595-62f1-4caf-a7a0-b0806904ad91)
