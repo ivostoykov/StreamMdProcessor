@@ -220,3 +220,8 @@ const StreamMarkdownProcessor = (function() {
     };
 
 })();
+
+// This checks if 'module' is defined, which is true in Node.js
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = StreamMarkdownProcessor;
+}
