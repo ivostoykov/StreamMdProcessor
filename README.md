@@ -1,5 +1,5 @@
 # StreamMdProcessor
-Attempt to handle stream marckdown
+Attempt to handle stream markdown. The main purpose of this small project was to handle the local AIs on the local machine. This is why this is not covering the full markdown but only the basics and even there lists are not handled yet. Perhaps this will be added later upon requrest.
 
 ## Usage
 
