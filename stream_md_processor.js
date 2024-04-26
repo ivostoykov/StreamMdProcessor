@@ -1,5 +1,5 @@
 const StreamMarkdownProcessor = (function() {
-
+    const triggerBlockChars = "*_`'#-+";
     var processedStreamData = '';
 
     function closeActiveTag(recipient){
@@ -29,7 +29,6 @@ const StreamMarkdownProcessor = (function() {
             className: 'lai-source',
             innerHTML: `<span class="lai-source-title">Code</span>\n`
         });
-        // recipient.innerHTML += pre.outerHTML;
         recipient.appendChild(pre); // ??? or previous line
         return recipient.querySelector('#laiActiveAiInput');
     }
@@ -91,8 +90,24 @@ const StreamMarkdownProcessor = (function() {
         return recipient.querySelector('#laiActiveAiInput');
     }
 
+    function switchToItalic(recipient, char){
+        recipient.setAttribute("id", "laiPreviousAiInput");
+        recipient.innerHTML += `<i id="laiActiveAiInput" data-char="${char}"></i>`;
+        return recipient.querySelector('#laiActiveAiInput');
+    }
+
+    function switchItalicToBold(recipient, char){
+        let currentHtml = recipient.outerHTML;
+        let parent = recipient.parentElement;
+        recipient.remove();
+        parent.innerHTML += currentHtml.replace(/^\<i/, '<b').replace(/i\>$/, 'b>');
+        return parent.querySelector('#laiActiveAiInput');
+    }
+
     function changeRecipient(char, recipient){
         let recipientTagName = recipient.tagName.toLowerCase();
+        const last4StreamChars = processedStreamData.slice(-4);
+
         if(recipientTagName.charAt(0) === 'h' && char === '\n'){
             return closeActiveTag(recipient);
         }
@@ -108,9 +123,17 @@ const StreamMarkdownProcessor = (function() {
                 recipient.innerHTML = recipient.innerHTML.replace(/-{1,}$/, '<hr>');
                 return recipient;
             }
-        }
 
-        const last4StreamChars = processedStreamData.slice(-4);
+            if(['b', 'strong', 'i', 'em'].includes(recipientTagName) && '*_'.indexOf(char) < 0 && '*_'.indexOf(last4StreamChars.slice(-1)) > -1){
+                return closeActiveTag(recipient);
+            } else if(!['b', 'strong', 'i', 'em'].includes(recipientTagName) && '*_'.indexOf(char) > -1 && '*_'.indexOf(last4StreamChars.slice(-1)) < 0){
+                return switchToItalic(recipient, char);
+            } else if(recipientTagName === 'i' && char === last4StreamChars.slice(-1) && '*_'.indexOf(char) > -1){
+                return switchItalicToBold(recipient, char);
+            } else if(['b', 'strong', 'i', 'em'].includes(recipientTagName)){
+                return recipient;
+            }
+        }
 
         if(/\n(`{3}|'{3})$/.test(last4StreamChars + char)){
             return handlePreTag(recipient);
@@ -153,7 +176,6 @@ const StreamMarkdownProcessor = (function() {
     }
 
     function checkForTrigger(char, lastStreamChar, recipientTagName){
-        const triggerBlockChars = "`'#-+";
         if(['b', 'strong', 'i', 'em'].includes(recipientTagName)){  return false;  }
         if(lastStreamChar === '' && triggerBlockChars.indexOf(char) > -1){  return true;  }
         if(triggerBlockChars.indexOf(lastStreamChar) > -1 && /\s/.test(char)){  return true;  }
@@ -167,7 +189,6 @@ const StreamMarkdownProcessor = (function() {
     }
 
     function processDataChunk(dataChunk, recipient){
-        const triggerBlockChars = "`'#-+";
         let recipientTagName = recipient.tagName.toLowerCase();
 
         dataChunk.split('').forEach(char => {
